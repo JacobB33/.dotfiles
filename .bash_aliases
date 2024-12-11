@@ -11,6 +11,10 @@ function bashmod () {
        	fi 
 }
 
+function copy_aliases() {
+	scp ~/.bash_aliases $1:~/.bash_aliases
+}
+
 function delete_conda_env() {
   # Prompt the user and read the input
   read -p "Are you sure you want to delete the conda environment '$1'? Type 'y' to confirm: " user_input
