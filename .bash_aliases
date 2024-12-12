@@ -31,6 +31,42 @@ function delete_conda_env() {
   fi
 }
 
+size() {
+  local depth=$1
+
+  # Validate input depth
+  if ! [[ "$depth" =~ ^[0-9]+$ ]]; then
+    # echo "Depth must be a non-negative integer." >&2
+    # return 1
+    depth=1
+  fi
+
+  # Use find and process files and directories to include sizes
+  find . -maxdepth "$depth" \( -type d -o -type f \) -print0 |
+    while IFS= read -r -d '' item; do
+      size=""
+      if [ -f "$item" ]; then
+        # Get the size of files
+        size=$(du -h --apparent-size --max-depth=0 "$item" | awk '{print $1}')
+      elif [ -d "$item" ]; then
+        # Get the cumulative size of directories
+        size=$(du -sh --apparent-size "$item" | awk '{print $1}')
+      fi
+
+      # Format the file tree structure
+      depth_level=$(echo "$item" | awk -F'/' '{print NF - 1}')
+      indent=""
+      for ((i = 0; i < depth_level; i++)); do
+        indent+="│   "
+      done
+
+      if [ -d "$item" ]; then
+        echo "${indent}├── ${item##*/}/ ($size)"
+      else
+        echo "${indent}├── ${item##*/} ($size)"
+      fi
+    done
+}
 
 function mcd () {
 	mkdir $1;
