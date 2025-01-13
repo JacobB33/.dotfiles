@@ -31,6 +31,38 @@ function delete_conda_env() {
   fi
 }
 
+update_klone_node_config() {
+    # Check if an argument is provided
+    if [ -z "$1" ]; then
+        echo "Usage: update_klone_node_config <hostname>"
+        return 1
+    fi
+
+    # Extract the hostname argument
+    new_hostname="$1"
+
+    # Define the path to the config file
+    config_file="$HOME/.ssh/klone-node-config"
+
+    # Check if the file exists
+    if [ ! -f "$config_file" ]; then
+        echo "Error: File $config_file does not exist."
+        return 1
+    fi
+
+    # Use sed to update the Hostname value
+    sed -i.bak "s/^\s*Hostname\s\+.*/  Hostname $new_hostname/" "$config_file"
+
+    if [ $? -eq 0 ]; then
+        echo "Hostname updated successfully in $config_file."
+        echo "Backup of the original file saved as $config_file.bak."
+    else
+        echo "Error: Failed to update the hostname."
+        return 1
+    fi
+}
+
+
 size() {
   local depth=$1
 
@@ -100,4 +132,3 @@ function print() {
 
 # Aliases:
 alias explore="xdg-open ."
-
